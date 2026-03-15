@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">GasoNow</string>
+    <string name="app_subtitle">Encuentra tu gasolinera ideal</string>
+
+    <!-- Search screen -->
+    <string name="title_distance">Distancia máxima</string>
+    <string name="label_distance_km">%d km</string>
+    <string name="title_fuel_type">Tipo de combustible</string>
+    <string name="fuel_gasolina_95">Gasolina 95</string>
+    <string name="fuel_gasolina_98">Gasolina 98</string>
+    <string name="fuel_diesel">Diésel</string>
+    <string name="fuel_diesel_premium">Diésel+</string>
+    <string name="fuel_glp">GLP</string>
+    <string name="fuel_gnc">GNC</string>
+    <string name="title_options">Opciones</string>
+    <string name="option_only_open">Solo gasolineras abiertas</string>
+    <string name="option_only_with_price">Solo con precio disponible</string>
+    <string name="title_sort">Ordenar por</string>
+    <string name="sort_price">Precio</string>
+    <string name="sort_distance">Distancia</string>
+    <string name="btn_search">Buscar gasolineras</string>
+
+    <!-- Results screen -->
+    <string name="results_title">Resultados</string>
+    <string name="results_count">%d gasolineras encontradas</string>
+    <string name="results_empty">No se encontraron gasolineras con los filtros seleccionados</string>
+    <string name="results_loading">Buscando gasolineras…</string>
+    <string name="results_error">Error al cargar los datos. Comprueba tu conexión.</string>
+    <string name="sort_by">Ordenar</string>
+
+    <!-- Station detail -->
+    <string name="detail_directions">Cómo llegar</string>
+    <string name="detail_unknown_schedule">Horario no disponible</string>
+    <string name="status_open">Abierta</string>
+    <string name="status_closed">Cerrada</string>
+    <string name="status_unknown">Horario desconocido</string>
+
+    <!-- Permissions -->
+    <string name="permission_location_title">Permiso de ubicación</string>
+    <string name="permission_location_message">GasoNow necesita acceder a tu ubicación para encontrar gasolineras cercanas.</string>
+    <string name="permission_denied_message">Sin acceso a la ubicación no es posible buscar gasolineras cercanas. Actívalo en Ajustes.</string>
+    <string name="btn_go_settings">Abrir ajustes</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="btn_retry">Reintentar</string>
+    <string name="price_per_liter">%s €/L</string>
+    <string name="distance_km">%.1f km</string>
+    <string name="no_price">Sin precio</string>
+</resources>

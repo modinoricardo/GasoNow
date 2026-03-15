@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Orange Theme -->
+    <color name="color_primary">#E85D04</color>
+    <color name="color_primary_dark">#C94F03</color>
+    <color name="color_primary_container">#FFDBCB</color>
+    <color name="color_on_primary">#FFFFFF</color>
+    <color name="color_on_primary_container">#340E00</color>
+    <color name="color_secondary">#9C4E1E</color>
+    <color name="color_secondary_container">#FFDBCB</color>
+    <color name="color_on_secondary">#FFFFFF</color>
+    <color name="color_background">#FFFBFF</color>
+    <color name="color_surface">#FFFBFF</color>
+    <color name="color_surface_variant">#F5ECEA</color>
+    <color name="color_on_surface">#201A18</color>
+    <color name="color_on_surface_variant">#534340</color>
+    <color name="color_outline">#857370</color>
+    <color name="color_error">#BA1A1A</color>
+
+    <!-- Status colors -->
+    <color name="color_open">#2E7D32</color>
+    <color name="color_closed">#C62828</color>
+    <color name="color_unknown">#FF8F00</color>
+    <color name="color_open_bg">#E8F5E9</color>
+    <color name="color_closed_bg">#FFEBEE</color>
+    <color name="color_unknown_bg">#FFF8E1</color>
+
+    <!-- Night theme -->
+    <color name="color_primary_night">#FFB59A</color>
+    <color name="color_background_night">#201A18</color>
+    <color name="color_surface_night">#201A18</color>
+    <color name="color_surface_variant_night">#534340</color>
+</resources>
