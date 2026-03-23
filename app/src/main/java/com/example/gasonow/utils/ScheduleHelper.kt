@@ -15,7 +15,7 @@ object ScheduleHelper {
         val is24h = h.contains("24H") || h.contains("24 H")
         val isAllWeek = h.contains("L-D") || h.contains("LUN-DOM") ||
                 h.contains("LUNES A DOMINGO") || h.contains("TODOS LOS DIAS") ||
-                !h.contains(";")
+                (!h.contains(";") && !h.contains(":"))
         if (is24h && isAllWeek) return true
 
         val calendar = Calendar.getInstance()

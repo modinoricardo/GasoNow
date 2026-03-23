@@ -12,7 +12,8 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="?attr/colorPrimary"
+        android:background="@drawable/bg_header_gradient"
+        android:fitsSystemWindows="true"
         app:elevation="4dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -153,9 +154,12 @@
                     android:layout_width="220dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
+                    android:max="100"
+                    android:progress="0"
                     app:indicatorColor="?attr/colorPrimary"
                     app:trackColor="?attr/colorSurfaceVariant"
-                    app:trackCornerRadius="4dp"/>
+                    app:trackCornerRadius="4dp"
+                    android:indeterminate="false" />
 
             </LinearLayout>
 

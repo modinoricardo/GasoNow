@@ -1,21 +1,15 @@
 package com.example.gasonow.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gasonow.repository.GasStationRepository
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = GasStationRepository()
+    private val repository = GasStationRepository(application)
 
-    init {
-        viewModelScope.launch {
-            try {
-                repository.prefetch()
-            } catch (e: Exception) {
-                // Silently ignore — si falla, la búsqueda lo reintentará
-            }
-        }
-    }
+    /** Llamar explícitamente para asegurar que el ViewModel se crea */
+    fun warmUp() = Unit
 }

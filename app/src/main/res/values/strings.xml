@@ -18,6 +18,8 @@
     <string name="title_sort">Ordenar por</string>
     <string name="sort_price">Precio</string>
     <string name="sort_distance">Distancia</string>
+    <string name="sort_by_price">Por precio</string>
+    <string name="sort_by_distance">Por distancia</string>
     <string name="btn_search">Buscar gasolineras</string>
 
     <!-- Results screen -->

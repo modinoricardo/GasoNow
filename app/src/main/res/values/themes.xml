@@ -23,4 +23,10 @@
         <item name="colorOnPrimary">@color/color_on_primary</item>
         <item name="android:colorBackground">@color/color_surface</item>
     </style>
+
+    <style name="Theme.GasoNow.Splash" parent="Theme.GasoNow">
+        <item name="android:windowBackground">@drawable/bg_splash</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
 </resources>

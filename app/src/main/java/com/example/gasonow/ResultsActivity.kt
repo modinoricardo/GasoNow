@@ -9,6 +9,7 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gasonow.adapter.GasStationAdapter
 import com.example.gasonow.databinding.ActivityResultsBinding
@@ -30,6 +31,7 @@ class ResultsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = ActivityResultsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -140,9 +142,18 @@ class ResultsActivity : AppCompatActivity() {
                         }
                         .start()
                     binding.tvResultsCount.text = getString(R.string.results_loading)
+                    val progress = when (state.message) {
+                        "Localizando provincia…"    -> 15
+                        "Descargando gasolineras…"  -> 40
+                        "Calculando distancias…"    -> 70
+                        "Aplicando filtros…"        -> 90
+                        else                        -> 5
+                    }
+                    binding.loadingProgressBar.setProgressCompat(progress, true)
                 }
 
                 is ResultsUiState.Success -> {
+                    binding.loadingProgressBar.setProgressCompat(100, true)
                     stopLoadingAnimation()
                     binding.recyclerView.visibility = View.VISIBLE
                     binding.tvResultsCount.text = getString(R.string.results_count, state.totalCount)
@@ -214,8 +225,8 @@ class ResultsActivity : AppCompatActivity() {
 
     private fun updateSortButtonText(sortBy: SortBy) {
         binding.btnSortToggle.text = when (sortBy) {
-            SortBy.PRICE -> getString(R.string.sort_price)
-            SortBy.DISTANCE -> getString(R.string.sort_distance)
+            SortBy.PRICE -> getString(R.string.sort_by_price)
+            SortBy.DISTANCE -> getString(R.string.sort_by_distance)
         }
     }
 

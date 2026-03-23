@@ -1,8 +1,9 @@
 package com.example.gasonow.viewmodel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gasonow.model.GasStation
 import com.example.gasonow.model.SearchFilters
@@ -17,9 +18,9 @@ sealed class ResultsUiState {
     object Empty : ResultsUiState()
 }
 
-class ResultsViewModel : ViewModel() {
+class ResultsViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = GasStationRepository()
+    private val repository = GasStationRepository(application)
 
     private val _uiState = MutableLiveData<ResultsUiState>(ResultsUiState.Loading())
     val uiState: LiveData<ResultsUiState> = _uiState

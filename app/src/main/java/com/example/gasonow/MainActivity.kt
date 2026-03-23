@@ -12,21 +12,35 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.example.gasonow.databinding.ActivityMainBinding
 import com.example.gasonow.model.FuelType
 import com.example.gasonow.model.SortBy
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import androidx.activity.viewModels
 import com.example.gasonow.viewmodel.MainViewModel
+import com.example.gasonow.ui.MenuBottomSheet
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val mainViewModel: MainViewModel by viewModels()
+
+    companion object {
+        private const val PREFS_FILTERS = "gasonow_search_prefs"
+        private const val KEY_DISTANCE = "pref_distance"
+        private const val KEY_FUEL_CHIP = "pref_fuel_chip"
+        private const val KEY_ONLY_OPEN = "pref_only_open"
+        private const val KEY_ONLY_WITH_PRICE = "pref_only_with_price"
+        private const val KEY_SORT_PRICE = "pref_sort_price"
+        private const val KEY_LAST_LAT = "last_lat"
+        private const val KEY_LAST_LON = "last_lon"
+    }
 
     private val requestPermissions = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -48,12 +62,60 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        lastLat = savedInstanceState?.let { if (it.containsKey(KEY_LAST_LAT)) it.getDouble(KEY_LAST_LAT) else null }
+        lastLon = savedInstanceState?.let { if (it.containsKey(KEY_LAST_LON)) it.getDouble(KEY_LAST_LON) else null }
+
+        mainViewModel // dispara el prefetch en background inmediatamente
         setupDistanceSlider()
         setupSearchButton()
         setupWindowInsets()
+        setupMenuButton()
+        restoreFilters()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        getSharedPreferences(PREFS_FILTERS, MODE_PRIVATE).edit()
+            .putFloat(KEY_DISTANCE, binding.sliderDistance.value)
+            .putInt(KEY_FUEL_CHIP, binding.chipGroupFuel.checkedChipId)
+            .putBoolean(KEY_ONLY_OPEN, binding.switchOnlyOpen.isChecked)
+            .putBoolean(KEY_ONLY_WITH_PRICE, binding.switchOnlyWithPrice.isChecked)
+            .putBoolean(KEY_SORT_PRICE, binding.radioSortPrice.isChecked)
+            .apply()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        lastLat?.let { outState.putDouble(KEY_LAST_LAT, it) }
+        lastLon?.let { outState.putDouble(KEY_LAST_LON, it) }
+    }
+
+    private fun restoreFilters() {
+        val prefs = getSharedPreferences(PREFS_FILTERS, MODE_PRIVATE)
+        val savedDistance = prefs.getFloat(KEY_DISTANCE, -1f)
+        if (savedDistance > 0) {
+            binding.sliderDistance.value = savedDistance
+        } else {
+            binding.tvTimeEstimate.text = estimateDriveTime(binding.sliderDistance.value.toInt())
+        }
+        val chipId = prefs.getInt(KEY_FUEL_CHIP, -1)
+        if (chipId != -1) binding.chipGroupFuel.check(chipId)
+        binding.switchOnlyOpen.isChecked = prefs.getBoolean(KEY_ONLY_OPEN, true)
+        binding.switchOnlyWithPrice.isChecked = prefs.getBoolean(KEY_ONLY_WITH_PRICE, true)
+        if (!prefs.getBoolean(KEY_SORT_PRICE, true)) binding.radioSortDistance.isChecked = true
+    }
+
+    private var lastLat: Double? = null
+    private var lastLon: Double? = null
+
+    private fun setupMenuButton() {
+        binding.btnMenu.setOnClickListener {
+            MenuBottomSheet.newInstance(lastLat, lastLon).show(supportFragmentManager, "menu")
+        }
     }
 
     private fun setupWindowInsets() {
@@ -64,7 +126,7 @@ class MainActivity : AppCompatActivity() {
             // Header: padding superior = altura status bar + 16dp (en vez de los 52dp fijos)
             binding.headerLayout.setPadding(
                 (24 * dp).toInt(),
-                systemBars.top + (16 * dp).toInt(),
+                systemBars.top + (20 * dp).toInt(),
                 (24 * dp).toInt(),
                 (32 * dp).toInt()
             )
@@ -85,11 +147,26 @@ class MainActivity : AppCompatActivity() {
 
             insets
         }
+        // Fuerza el re-despacho de insets por si ya se emitieron antes de registrar el listener
+        ViewCompat.requestApplyInsets(binding.root)
     }
 
     private fun setupDistanceSlider() {
         binding.sliderDistance.addOnChangeListener { _, value, _ ->
-            binding.tvDistanceValue.text = "${value.toInt()} km"
+            val km = value.toInt()
+            binding.tvDistanceValue.text = "$km km"
+            binding.tvTimeEstimate.text = estimateDriveTime(km)
+        }
+    }
+
+    private fun estimateDriveTime(km: Int): String {
+        val minutes = km // ~60 km/h → 1 min por km
+        return if (minutes < 60) {
+            "~$minutes min en coche"
+        } else {
+            val h = minutes / 60
+            val m = minutes % 60
+            if (m == 0) "~${h}h en coche" else "~${h}h ${m}min en coche"
         }
     }
 
@@ -126,40 +203,57 @@ class MainActivity : AppCompatActivity() {
 
         val fusedClient = LocationServices.getFusedLocationProviderClient(this)
         try {
-            fusedClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
-                .addOnSuccessListener { location ->
-                    binding.btnSearch.isEnabled = true
-                    binding.btnSearch.text = getString(R.string.btn_search)
-                    if (location != null) {
-                        startResultsActivity(location.latitude, location.longitude)
+            // 1. lastLocation es instantáneo: ya lo tiene el sistema cacheado
+            fusedClient.lastLocation
+                .addOnSuccessListener { lastLoc ->
+                    if (lastLoc != null) {
+                        resetSearchButton()
+                        startResultsActivity(lastLoc.latitude, lastLoc.longitude)
                     } else {
-                        // Try last known location
-                        fusedClient.lastLocation.addOnSuccessListener { lastLoc ->
-                            if (lastLoc != null) {
-                                startResultsActivity(lastLoc.latitude, lastLoc.longitude)
-                            } else {
-                                Toast.makeText(
-                                    this,
-                                    "No se pudo obtener tu ubicación. Activa el GPS.",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
+                        // 2. Sin caché: pide ubicación con precisión balanceada (red/WiFi, ~2-3 seg)
+                        requestFreshLocation(fusedClient)
                     }
                 }
-                .addOnFailureListener {
-                    binding.btnSearch.isEnabled = true
-                    binding.btnSearch.text = getString(R.string.btn_search)
-                    Toast.makeText(this, "Error al obtener ubicación: ${it.message}", Toast.LENGTH_SHORT).show()
-                }
+                .addOnFailureListener { requestFreshLocation(fusedClient) }
         } catch (e: SecurityException) {
-            binding.btnSearch.isEnabled = true
-            binding.btnSearch.text = getString(R.string.btn_search)
+            resetSearchButton()
             checkLocationPermissionAndSearch()
         }
     }
 
+    private fun requestFreshLocation(fusedClient: FusedLocationProviderClient) {
+        try {
+            fusedClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
+                .addOnSuccessListener { location ->
+                    resetSearchButton()
+                    if (location != null) {
+                        startResultsActivity(location.latitude, location.longitude)
+                    } else {
+                        Toast.makeText(
+                            this,
+                            "No se pudo obtener tu ubicación. Activa el GPS.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+                .addOnFailureListener {
+                    resetSearchButton()
+                    Toast.makeText(this, "Error al obtener ubicación: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: SecurityException) {
+            resetSearchButton()
+            checkLocationPermissionAndSearch()
+        }
+    }
+
+    private fun resetSearchButton() {
+        binding.btnSearch.isEnabled = true
+        binding.btnSearch.text = getString(R.string.btn_search)
+    }
+
     private fun startResultsActivity(lat: Double, lon: Double) {
+        lastLat = lat
+        lastLon = lon
         val fuelType = getSelectedFuelType()
         val sortBy = if (binding.radioSortPrice.isChecked) SortBy.PRICE else SortBy.DISTANCE
         val maxDistance = binding.sliderDistance.value.toInt()

@@ -18,18 +18,35 @@
         android:orientation="vertical"
         android:paddingStart="24dp"
         android:paddingTop="52dp"
-        android:paddingEnd="24dp"
+        android:paddingEnd="8dp"
         android:paddingBottom="32dp"
         android:elevation="8dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="⛽ GasoNow"
-            android:textColor="#FFFFFF"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.02" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="⛽ GasoNow"
+                android:textColor="#FFFFFF"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.02" />
+
+            <ImageButton
+                android:id="@+id/btnMenu"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_more_vert"
+                android:contentDescription="Menú" />
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
@@ -91,14 +108,32 @@
                             android:drawableStart="@drawable/ic_location"
                             android:drawablePadding="8dp" />
 
-                        <TextView
-                            android:id="@+id/tvDistanceValue"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="10 km"
-                            android:textColor="?attr/colorPrimary"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:orientation="vertical"
+                            android:gravity="end">
+
+                            <TextView
+                                android:id="@+id/tvDistanceValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="end"
+                                android:text="10 km"
+                                android:textColor="?attr/colorPrimary"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvTimeEstimate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="end"
+                                android:text="~10 min en coche"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
                     </LinearLayout>
 
                     <com.google.android.material.slider.Slider
