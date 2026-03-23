@@ -29,7 +29,7 @@
     <color name="color_unknown_bg">#FFF8E1</color>
 
     <!-- Night theme -->
-    <color name="color_primary_night">#FFB59A</color>
+    <color name="color_primary_night">#FFB300</color>
     <color name="color_background_night">#201A18</color>
     <color name="color_surface_night">#201A18</color>
     <color name="color_surface_variant_night">#534340</color>
